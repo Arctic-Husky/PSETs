@@ -39,7 +39,7 @@ struct pilha* novaPilha(int tamanho)
     struct pilha *pi = (struct pilha*)malloc(sizeof(struct pilha *) + tamanho * sizeof(disco));
   
     //pilha->top = -1;
-    pi->discos = (disco*)malloc(sizeof(disco));
+    pi->discos = (disco*)malloc(sizeof(disco) + tamanho * sizeof(disco));
     pi->id = idIndex;
     pi->count = 0;
     idIndex = idIndex + 1;
@@ -85,9 +85,10 @@ int main(int argc, char *argv[ ])
   preenche_torre(torre1,discos,tamanho);
 
   tentar_mover(torre1,torre2);
+  tentar_mover(torre1,torre2);
 
-  printf("\nVerificação: %s\n",verificar_vitoria(torre3, tamanho) == 1 ? "Pilha preenchida corretamente!" : "Pilha falta disco(s)");
-
+  printf("\nVerificação: %s\n",verificar_vitoria(torre3, tamanho) == 1 ? "Pilha preenchida corretamente!" : "Pilha3 falta disco(s)");
+  
   free(torre1);
   free(torre2);
   free(torre3);
@@ -115,19 +116,21 @@ void tentar_mover(struct pilha *pilha, struct pilha *pilhaAlvo)
 
 int verificar_vitoria(struct pilha *pilha,int tamanho)
 {
-  struct pilha temp;
-  temp.discos = pilha->discos;
-  temp.top = pilha->top;
-  temp.count = pilha->count;
-  temp.id = pilha->id;
+  struct pilha temp = *pilha;
+  // temp.discos = pilha->discos;
+  // temp.top = pilha->top;
+  // temp.count = pilha->count;
+  temp.id = pilha->id+1;
 
-  int contagemDePops;
-
-  for(int i = 0; i < temp.count; i++)
+  int contagemDePops = 0;
+  
+  for(int i = 0; i < pilha->count; i++)
   {
     pop(&temp);
     contagemDePops+=1;
   }
+
+  printf("contagemDePops = %d, Tamanho = %d\n", contagemDePops, tamanho);
 
   if(contagemDePops == tamanho)
   {
@@ -149,12 +152,14 @@ int isEmpty(struct pilha *pilha)
 
 void preenche_torre(struct pilha *pilha, disco *arrayDiscos,int tamanho)
 {
+  printf("\n---PREENCHENDO TORRE INICIAL---");
   for(int i = 0; i < tamanho; i++)
   {
     push(pilha,arrayDiscos[i]);
-    printf("Inserido: %d em pilha%d\n", arrayDiscos[i].valor, pilha->id);
+    printf("Inserido: disco %d em pilha%d\n", arrayDiscos[i].valor, pilha->id);
   }
 
+  printf("-------------------------------\n");
   printf("\n");
 }
 
@@ -162,7 +167,7 @@ void push(struct pilha *pilha, disco disco)
 {
   pilha->top = disco;
   pilha->discos[pilha->count] = disco;
-  printf("\nPushed %d para pilha%d\n",pilha->discos[pilha->count].valor, pilha->id);
+  printf("\nPushed disco %d para pilha%d\n",pilha->discos[pilha->count].valor, pilha->id);
   pilha->count+=1;
 }
 
@@ -176,7 +181,7 @@ disco pop(struct pilha *pilha)
 
   disco temp = pilha->top;
   
-  printf("%d POPPADO de pilha%d!\n",pilha->top.valor, pilha->id);
+  printf("Disco %d POPPADO de pilha%d!\n",pilha->top.valor, pilha->id);
 
   pilha->top = pilha->discos[pilha->count-2];
   pilha->count-=1;
